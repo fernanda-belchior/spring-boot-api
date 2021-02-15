@@ -23,4 +23,5 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Client findByName(String name) {return clientRepository.findByNameIgnoreCaseContaining(name);}
 
+
 }

@@ -3,16 +3,20 @@ package br.com.fernanda.springbootinterview.service.impl;
 import br.com.fernanda.springbootinterview.model.City;
 import br.com.fernanda.springbootinterview.repository.CityRepository;
 import br.com.fernanda.springbootinterview.service.CityService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Getter
+@Setter
 public class CityServiceImpl implements CityService {
 
     @Autowired
-    CityRepository cityRepository;
+    private CityRepository cityRepository;
 
     public void save(City city) {
         cityRepository.save(city);
@@ -25,4 +29,7 @@ public class CityServiceImpl implements CityService {
     public List<City> findByState(String state) { return cityRepository.findByStateIgnoreCaseContaining(state);}
 
 
+    public CityRepository getCityRepository() {
+        return cityRepository;
+    }
 }
