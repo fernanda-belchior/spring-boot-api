@@ -1,9 +1,11 @@
-package br.com.fernanda.springbootinterview.endpoint;
+package br.com.fernanda.springbootinterview.api;
 
 import br.com.fernanda.springbootinterview.exception.ResourceAlreadyRegisteredException;
 import br.com.fernanda.springbootinterview.exception.ResourceNotFoundException;
 import br.com.fernanda.springbootinterview.exception.InvalidArgumentException;
 import br.com.fernanda.springbootinterview.service.ClientService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import br.com.fernanda.springbootinterview.enums.GenderEnum;
 import br.com.fernanda.springbootinterview.dto.ClientDTO;
@@ -12,45 +14,49 @@ import br.com.fernanda.springbootinterview.util.DateUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.extern.slf4j.Slf4j;
 import javax.validation.Valid;
+import lombok.Setter;
 
-@Slf4j
+
+@Setter
 @RestController
 @RequestMapping("/client")
-public class ClientEndpoint {
+@Api(value = "Client API")
+public class ClientAPI {
 
-    private static String MESSAGE_CLIENT_REGISTERED = "The client cannot be registered ";
-    private static String MESSAGE_CLIENT_NOT_FOUND = "Client not found";
-
+    private static final String MESSAGE_CLIENT_REGISTERED = "The client cannot be registered ";
+    private static final String MESSAGE_CLIENT_NOT_FOUND = "Client not found";
+    private static final String MESSAGE_INVALID_GENDER = "Gender must be 'F' or 'M' in upper case.";
+    private static final String MESSAGE_INVALID_BIRTH_DATE = "Invalid birth date. " +
+            "Please enter a valid date";
 
     @Autowired
     private ClientService clientService;
 
     @GetMapping("/findByName/{name}")
-    public ResponseEntity<?> findByName(@Valid @PathVariable("name") String name) {
-        if(!this.verifyIfClientExistsByName(name)){
+    @ApiOperation(value = "** FIND CLIENT BY NAME **")
+    public ResponseEntity<?> findByName( @PathVariable("name") String name) {
+        Client client = clientService.findByName(name.toUpperCase());
+        if(client == null ){
             throw new ResourceNotFoundException(MESSAGE_CLIENT_NOT_FOUND);
         }
-
-
-        Client client = clientService.findByName(name);
         ClientDTO clientDTO = new ClientDTO();
         clientDTO = this.clientDTOMapper(client, clientDTO);
         return new ResponseEntity<>(clientDTO, HttpStatus.OK);
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<?> edit(@Valid @PathVariable("id") long id) {
+    @ApiOperation(value = "** FIND CLIENT BY ID **")
+    public ResponseEntity<?> findById( @PathVariable("id") long id) {
         this.verifyIfClientExistsById(id);
         Client client = clientService.findById(id);
-        ClientDTO clientDTO = new ClientDTO();
-        clientDTO = this.clientDTOMapper(client, clientDTO);
+        ClientDTO clientDTO =  this.clientDTOMapper(client, new ClientDTO());
         return new ResponseEntity<>(clientDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<?> remove(@Valid @RequestBody ClientDTO clientDTO) {
+    @ApiOperation(value = "** REMOVE CLIENT **")
+    public ResponseEntity<?> remove( @RequestBody ClientDTO clientDTO) {
         this.verifyIfClientExistsByName(clientDTO.getName());
         Client client = clientService.findByName(clientDTO.getName());
         this.clientService.remove(client);
@@ -58,6 +64,7 @@ public class ClientEndpoint {
     }
 
     @PostMapping("/save")
+    @ApiOperation(value = "** SAVE CLIENT **")
     public ResponseEntity<?> save( @Valid @RequestBody ClientDTO clientDTO) {
         Client client = new Client();
 
@@ -66,7 +73,7 @@ public class ClientEndpoint {
                client = this.clientMapper(clientDTO, client);
                this.clientService.save(client);
             }else{
-                throw new InvalidArgumentException("Invalid birth date");
+                throw new InvalidArgumentException(MESSAGE_INVALID_BIRTH_DATE);
             }
         }
         else{
@@ -74,11 +81,12 @@ public class ClientEndpoint {
         }
 
         clientDTO.setId(client.getId());
-        return new ResponseEntity<>(clientDTO, HttpStatus.OK);
+        return new ResponseEntity<>(clientDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/updateName")
-    public ResponseEntity<?> update(@Valid @RequestBody ClientDTO clientDTO) {
+    @ApiOperation(value = "** UPDATE CLIENT NAME **")
+    public ResponseEntity<?> updateName( @RequestBody ClientDTO clientDTO) {
         this.verifyIfClientExistsById(clientDTO.getId());
 
         Client client = this.clientService.findById(clientDTO.getId());
@@ -99,7 +107,7 @@ public class ClientEndpoint {
 
     private void verifyIfClientExistsById(Long id){
         if (this.clientService.findById(id) == null)
-            throw new ResourceNotFoundException("Client not found for ID: "+id);
+            throw new ResourceNotFoundException(MESSAGE_CLIENT_NOT_FOUND);
     }
 
     private Client clientMapper(ClientDTO clientDTO, Client client) {
@@ -110,7 +118,7 @@ public class ClientEndpoint {
         } else if (clientDTO.getGender() == 'F') {
             client.setGender(GenderEnum.F);
         }else{
-            throw new InvalidArgumentException("Gender must be 'F' or 'M' in upper case.");
+            throw new InvalidArgumentException(MESSAGE_INVALID_GENDER);
         }
 
        client.setCity(clientDTO.getCity());

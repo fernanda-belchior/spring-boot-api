@@ -17,11 +17,8 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void remove(Client client) {clientRepository.delete(client);}
     @Override
-    public Client findById(Long id) {
-        return clientRepository.getOne(id);
-    }
+    public Client findById(Long id) { return clientRepository.getOne(id);}
     @Override
     public Client findByName(String name) {return clientRepository.findByNameIgnoreCaseContaining(name);}
-
 
 }

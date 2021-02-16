@@ -4,16 +4,11 @@ import br.com.fernanda.springbootinterview.enums.GenderEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-
-
 import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Data
@@ -46,4 +41,5 @@ public class Client implements Serializable {
         this.age = age;
         this.city = city;
     }
+
 }
