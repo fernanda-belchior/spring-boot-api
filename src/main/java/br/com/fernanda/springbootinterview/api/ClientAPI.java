@@ -76,7 +76,7 @@ public class ClientAPI {
         if(!verifyIfClientExistsByName(clientDTO.getName())){
             if(DateUtil.isValidDate(clientDTO.getBirthDate())){
                client = this.clientMapper(clientDTO, client);
-               client.setCity(city);
+               client.getCity().setId(city.getId());
                client.setId(null);
                this.clientService.save(client);
             }else{
