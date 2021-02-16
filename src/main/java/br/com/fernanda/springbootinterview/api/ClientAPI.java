@@ -3,6 +3,8 @@ package br.com.fernanda.springbootinterview.api;
 import br.com.fernanda.springbootinterview.exception.ResourceAlreadyRegisteredException;
 import br.com.fernanda.springbootinterview.exception.ResourceNotFoundException;
 import br.com.fernanda.springbootinterview.exception.InvalidArgumentException;
+import br.com.fernanda.springbootinterview.model.City;
+import br.com.fernanda.springbootinterview.service.CityService;
 import br.com.fernanda.springbootinterview.service.ClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +34,8 @@ public class ClientAPI {
 
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private CityService cityService;
 
     @GetMapping("/findByName/{name}")
     @ApiOperation(value = "** FIND CLIENT BY NAME **")
@@ -67,10 +71,13 @@ public class ClientAPI {
     @ApiOperation(value = "** SAVE CLIENT **")
     public ResponseEntity<?> save( @Valid @RequestBody ClientDTO clientDTO) {
         Client client = new Client();
+        City city = this.cityService.validateCity(clientDTO.getCity());
 
         if(!verifyIfClientExistsByName(clientDTO.getName())){
             if(DateUtil.isValidDate(clientDTO.getBirthDate())){
                client = this.clientMapper(clientDTO, client);
+               client.setCity(city);
+               client.setId(null);
                this.clientService.save(client);
             }else{
                 throw new InvalidArgumentException(MESSAGE_INVALID_BIRTH_DATE);
@@ -141,4 +148,5 @@ public class ClientAPI {
         return clientDTO;
 
     }
+
 }

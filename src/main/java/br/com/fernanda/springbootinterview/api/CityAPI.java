@@ -5,6 +5,7 @@ import br.com.fernanda.springbootinterview.exception.ResourceAlreadyRegisteredEx
 import br.com.fernanda.springbootinterview.exception.ResourceNotFoundException;
 import br.com.fernanda.springbootinterview.model.City;
 import br.com.fernanda.springbootinterview.service.CityService;
+import br.com.fernanda.springbootinterview.util.StateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Setter;
@@ -27,12 +28,7 @@ public class CityAPI {
     private static final String MESSAGE_CITY_NOT_FOUND = "City not found";
     private static final String MESSAGE_INVALID_STATE = "State is not exist. Plese type in the format = 'LL'";
 
-    private static List<String> stateList = Arrays.asList(
-            "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MS",
-            "MT","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO");
-
-
-    @Autowired
+   @Autowired
     private CityService cityService;
 
     @GetMapping("/findByName/{name}")
@@ -60,7 +56,7 @@ public class CityAPI {
     @ApiOperation(value = "** SAVE CITY **")
     public ResponseEntity<?> save(@Valid @RequestBody City city) {
         List<City> list = this.cityService.findByName(city.getName());
-        if(!stateList.contains(city.getState().toUpperCase())){
+        if(!StateUtil.getStateList().contains(city.getState().toUpperCase())){
             throw new InvalidArgumentException(MESSAGE_INVALID_STATE);
         }
 
@@ -74,6 +70,7 @@ public class CityAPI {
         }
         city.setName(city.getName().toUpperCase());
         city.setState(city.getState().toUpperCase());
+        city.setId(null);
         this.cityService.save(city);
         return new ResponseEntity<>(city, HttpStatus.CREATED);
 

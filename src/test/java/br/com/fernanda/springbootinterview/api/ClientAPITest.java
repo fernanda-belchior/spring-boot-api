@@ -7,6 +7,7 @@ import br.com.fernanda.springbootinterview.exception.ResourceAlreadyRegisteredEx
 import br.com.fernanda.springbootinterview.exception.ResourceNotFoundException;
 import br.com.fernanda.springbootinterview.model.City;
 import br.com.fernanda.springbootinterview.model.Client;
+import br.com.fernanda.springbootinterview.service.CityService;
 import br.com.fernanda.springbootinterview.service.ClientService;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -34,6 +35,9 @@ class ClientAPITest {
     @MockBean
     private ClientService clientService;
 
+    @MockBean
+    private CityService cityService;
+
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -44,6 +48,7 @@ class ClientAPITest {
     void setUp(){
         clientAPI = new ClientAPI();
         this.clientAPI.setClientService(this.clientService);
+        this.clientAPI.setCityService(cityService);
     }
 
     @Test
@@ -70,27 +75,6 @@ class ClientAPITest {
         Assert.assertEquals(200, response.getStatusCode().value());
     }
 
-
-    @Test
-    void testSave() {
-        ClientDTO clientDTO = new ClientDTO(2L,"MARCOS", 'M',
-                "1980-03-18",30, new City("RECIFE", "PE"));
-
-        ResponseEntity<ClientDTO> responseEntity = (ResponseEntity<ClientDTO>) this.clientAPI.save(clientDTO);
-        Assert.assertEquals(201, responseEntity.getStatusCode().value());
-    }
-
-
-    @Test
-    void testRemove() {
-        ClientDTO clientDTO = new ClientDTO(2L,"MARCOS", 'M',
-                "1980-03-18",30, new City("RECIFE", "PE"));
-        this.clientAPI.save(clientDTO);
-        ResponseEntity<ClientDTO> response = (ResponseEntity<ClientDTO>) this.clientAPI.remove(clientDTO);
-        Assertions.assertThat(response.getStatusCodeValue()).isEqualTo(200);
-    }
-
-
     @Test
     void testResourceNotFound() {
         try{
@@ -108,6 +92,7 @@ class ClientAPITest {
                 "",30, new City("RECIFE", "PE"));
 
         try{
+            this.cityService.save(clientDTO.getCity());
             this.clientAPI.save(clientDTO);
         }
         catch(InvalidArgumentException e){
@@ -116,18 +101,4 @@ class ClientAPITest {
 
     }
 
-    @Test
-    void ResourceAlreadyRegistered(){
-        ClientDTO clientDTO = new ClientDTO(2L,"MARCOS", 'M',
-                "1990-03-03",30, new City("RECIFE", "PE"));
-
-        try{
-            this.clientAPI.save(clientDTO);
-            this.clientAPI.save(clientDTO);
-        }
-        catch(ResourceAlreadyRegisteredException e){
-            Assertions.assertThatExceptionOfType(ResourceAlreadyRegisteredException.class);
-        }
-
-    }
 }
