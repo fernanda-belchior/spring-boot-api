@@ -8,5 +8,4 @@ public interface ClientService {
     void remove(Client client) ;
     Client findById(Long id) ;
     Client findByName(String name) ;
-
 }

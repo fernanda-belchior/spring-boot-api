@@ -1,6 +1,7 @@
 package br.com.fernanda.springbootinterview.dto;
 
 import br.com.fernanda.springbootinterview.model.City;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ClientDTO implements Serializable {
 
-    private long id;
+    private Long id;
     @NotBlank(message = "{name.not.blank}")
     private String name;
     @NotNull(message = "{gender.not.null}")

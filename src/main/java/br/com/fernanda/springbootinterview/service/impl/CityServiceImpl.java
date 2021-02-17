@@ -1,7 +1,6 @@
 package br.com.fernanda.springbootinterview.service.impl;
 
 import br.com.fernanda.springbootinterview.exception.InvalidArgumentException;
-import br.com.fernanda.springbootinterview.exception.ResourceAlreadyRegisteredException;
 import br.com.fernanda.springbootinterview.exception.ResourceNotFoundException;
 import br.com.fernanda.springbootinterview.model.City;
 import br.com.fernanda.springbootinterview.repository.CityRepository;
@@ -31,8 +30,9 @@ public class CityServiceImpl implements CityService {
     public List<City> findByState(String state) {return cityRepository.findByStateIgnoreCaseContaining(state);}
 
     @Override
-    public City validateCity(City city){
+    public void validateCity(City city){
 
+        boolean validate= false;
 
         if(city.getName()==null || city.getName().isEmpty()){
             throw new InvalidArgumentException("City shouldn't be blank.");
@@ -56,11 +56,11 @@ public class CityServiceImpl implements CityService {
         for (City city2 : list) {
             if (city2.getName().equalsIgnoreCase(city.getName())
                         && city2.getState().equalsIgnoreCase(city.getState())) {
-                    return city2;
+                    validate = true;
                 }
         }
 
-        throw new ResourceNotFoundException("City not yet registered.");
+        if (!validate)throw new ResourceNotFoundException("City not yet registered.");
 
     }
 

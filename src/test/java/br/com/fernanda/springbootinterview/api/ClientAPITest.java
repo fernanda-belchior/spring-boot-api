@@ -2,12 +2,9 @@ package br.com.fernanda.springbootinterview.api;
 
 import br.com.fernanda.springbootinterview.dto.ClientDTO;
 import br.com.fernanda.springbootinterview.enums.GenderEnum;
-import br.com.fernanda.springbootinterview.exception.InvalidArgumentException;
-import br.com.fernanda.springbootinterview.exception.ResourceAlreadyRegisteredException;
 import br.com.fernanda.springbootinterview.exception.ResourceNotFoundException;
 import br.com.fernanda.springbootinterview.model.City;
 import br.com.fernanda.springbootinterview.model.Client;
-import br.com.fernanda.springbootinterview.service.CityService;
 import br.com.fernanda.springbootinterview.service.ClientService;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -15,11 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDate;
@@ -35,12 +30,6 @@ class ClientAPITest {
     @MockBean
     private ClientService clientService;
 
-    @MockBean
-    private CityService cityService;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
     private ClientAPI clientAPI;
 
 
@@ -48,7 +37,6 @@ class ClientAPITest {
     void setUp(){
         clientAPI = new ClientAPI();
         this.clientAPI.setClientService(this.clientService);
-        this.clientAPI.setCityService(cityService);
     }
 
     @Test
@@ -85,20 +73,5 @@ class ClientAPITest {
         }
     }
 
-    @Test
-    void testInvalidArgument() {
-
-        ClientDTO clientDTO = new ClientDTO(2L,"MARCOS", 'L',
-                "",30, new City("RECIFE", "PE"));
-
-        try{
-            this.cityService.save(clientDTO.getCity());
-            this.clientAPI.save(clientDTO);
-        }
-        catch(InvalidArgumentException e){
-            Assertions.assertThatExceptionOfType(InvalidArgumentException.class);
-        }
-
-    }
 
 }

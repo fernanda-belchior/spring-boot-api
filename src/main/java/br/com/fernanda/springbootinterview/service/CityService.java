@@ -8,5 +8,5 @@ public interface CityService {
     void save(City city);
     List<City> findByName(String name);
     List<City> findByState(String state);
-    City validateCity(City city);
+    void validateCity(City city);
 }
